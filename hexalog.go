@@ -39,6 +39,14 @@ type Hexalog struct {
 	jury Jury
 }
 
+func NewHexalog(trans WALTransport, minVotes int, hashFunc func() hash.Hash) *Hexalog {
+	return &Hexalog{trans: trans, minVotes: minVotes, hashFunc: hashFunc}
+}
+
+func (hexlog *Hexalog) RegisterJury(jury Jury) {
+	hexlog.jury = jury
+}
+
 // NewEntry returns a new Entry for the given key from Hexalog.  It returns an
 // error if the node is not part of the location set or a lookup error occurs
 func (hexlog *Hexalog) NewEntry(key []byte) (*hexalog.Entry, []*hexalog.Participant, error) {

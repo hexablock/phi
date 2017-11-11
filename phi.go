@@ -40,6 +40,7 @@ type WAL interface {
 	NewEntryFrom(entry *hexalog.Entry) (*hexalog.Entry, []*hexalog.Participant, error)
 	ProposeEntry(entry *hexalog.Entry, opts *hexalog.RequestOptions, retries int, retryInt time.Duration) ([]byte, *WriteStats, error)
 	GetEntry(key []byte, id []byte) (*hexalog.Entry, error)
+	RegisterJury(jury Jury)
 }
 
 // FSM implements a phi fsm using a dht
@@ -218,7 +219,9 @@ func (phi *Phi) initHexalog(fsm FSM) error {
 	// fsm := NewFSM(phi.conf.KVPrefix, localTuple, phi.kvstore)
 	fsm.RegisterDHT(phi.dht)
 
-	hexlog, err := hexalog.NewHexalog(phi.conf.Hexalog, fsm, entries, index, stable, hlnet)
+	c := phi.conf.Hexalog
+
+	hexlog, err := hexalog.NewHexalog(c, fsm, entries, index, stable, hlnet)
 	if err != nil {
 		return err
 	}
@@ -226,17 +229,20 @@ func (phi *Phi) initHexalog(fsm FSM) error {
 	phi.hexalog = hexlog
 
 	trans := &localHexalogTransport{
-		host:   phi.conf.Hexalog.AdvertiseHost,
+		host:   c.AdvertiseHost,
 		hexlog: hexlog,
 		remote: hlnet,
 	}
 
-	phi.wal = &Hexalog{
-		hashFunc: phi.conf.Hexalog.Hasher,
-		minVotes: phi.conf.Hexalog.Votes,
-		trans:    trans,
-		jury:     &SimpleJury{dht: phi.dht},
-	}
+	phi.wal = NewHexalog(trans, c.Votes, c.Hasher)
+	phi.wal.RegisterJury(NewSimpleJury(phi.dht))
+
+	// phi.wal = &Hexalog{
+	// 	hashFunc: c.Hasher,
+	// 	minVotes: c.Votes,
+	// 	trans:    trans,
+	// 	jury:     &SimpleJury{dht: phi.dht},
+	// }
 
 	return nil
 }

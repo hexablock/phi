@@ -43,6 +43,7 @@ type testFSM struct {
 }
 
 func (fsm *testFSM) Apply(id []byte, entry *hexalog.Entry) interface{} {
+	log.Printf("Test FSM key=%s", entry.Key)
 	return nil
 }
 
@@ -87,6 +88,14 @@ func Test_Fidias(t *testing.T) {
 	if err = fid2.Join([]string{"127.0.0.1:44550"}); err != nil {
 		t.Fatal(err)
 	}
+	// node 4
+	fid3, err := newTestPhi("127.0.0.1:41003", "127.0.0.1:18083", "127.0.0.1", 44553)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = fid3.Join([]string{"127.0.0.1:44550"}); err != nil {
+		t.Fatal(err)
+	}
 
 	<-time.After(2 * time.Second)
 
@@ -101,6 +110,18 @@ func Test_Fidias(t *testing.T) {
 	defer rd.Close()
 
 	if err = blx.WriteIndex(rd); err != nil {
+		t.Fatal(err)
+	}
+
+	wal := fid2.WAL()
+	entry, p, err := wal.NewEntry([]byte("key"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	opt := hexalog.DefaultRequestOptions()
+	opt.PeerSet = p
+
+	if _, _, err := wal.ProposeEntry(entry, opt, 3, 30*time.Millisecond); err != nil {
 		t.Fatal(err)
 	}
 
