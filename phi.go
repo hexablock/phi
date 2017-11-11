@@ -24,7 +24,7 @@ type DHT interface {
 	LookupGroupNodes(key []byte) ([]*hexatype.Node, error)
 	Lookup(key []byte) ([]*hexatype.Node, error)
 	Insert(key []byte, tuple kelips.TupleHost) error
-	Delete(key []byte) error
+	Delete(key []byte, tuple kelips.TupleHost) error
 }
 
 // WALTransport implements an interface for network log operations
@@ -195,6 +195,7 @@ func (phi *Phi) initHexalog(fsm FSM) error {
 	// Data stores
 	//entries := hexalog.NewInMemEntryStore()
 	//index := hexalog.NewInMemIndexStore()
+
 	edir := filepath.Join(phi.conf.DataDir, "log", "entry")
 	os.MkdirAll(edir, 0755)
 	entries := hexaboltdb.NewEntryStore()
@@ -215,8 +216,6 @@ func (phi *Phi) initHexalog(fsm FSM) error {
 
 	stable := &hexalog.InMemStableStore{}
 
-	// localTuple := kelips.TupleHost(phi.local.Address)
-	// fsm := NewFSM(phi.conf.KVPrefix, localTuple, phi.kvstore)
 	fsm.RegisterDHT(phi.dht)
 
 	c := phi.conf.Hexalog

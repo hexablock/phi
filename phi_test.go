@@ -120,7 +120,8 @@ func Test_Fidias(t *testing.T) {
 	}
 	opt := hexalog.DefaultRequestOptions()
 	opt.PeerSet = p
-
+	opt.WaitApply = true
+	opt.WaitBallot = true
 	if _, _, err := wal.ProposeEntry(entry, opt, 3, 30*time.Millisecond); err != nil {
 		t.Fatal(err)
 	}

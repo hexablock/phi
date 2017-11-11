@@ -19,7 +19,8 @@ func (phi *Phi) BlockSet(blk block.Block) {
 
 // BlockRemove is the blox delegate to handle block removals from the dht
 func (phi *Phi) BlockRemove(id []byte) {
-	if err := phi.dht.Delete(id); err != nil {
+	tuple := kelips.TupleHost(phi.local.Address)
+	if err := phi.dht.Delete(id, tuple); err != nil {
 		log.Printf("[ERROR] Failed to delete from dht: %s", err)
 	}
 }
