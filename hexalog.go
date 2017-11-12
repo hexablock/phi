@@ -39,10 +39,12 @@ type Hexalog struct {
 	jury Jury
 }
 
+// NewHexalog inita a new DHT aware WAL
 func NewHexalog(trans WALTransport, minVotes int, hashFunc func() hash.Hash) *Hexalog {
 	return &Hexalog{trans: trans, minVotes: minVotes, hashFunc: hashFunc}
 }
 
+// RegisterJury registers a jury interface used to get participants
 func (hexlog *Hexalog) RegisterJury(jury Jury) {
 	hexlog.jury = jury
 }

@@ -69,7 +69,7 @@ func (phi *Phi) NotifyPingComplete(node *memberlist.Node, rtt time.Duration, pay
 	}
 
 	tuple := kelips.TupleHost(remoteNode.Address)
-	if err = phi.updateCoords(tuple.String(), &other, rtt); err != nil {
+	if err = phi.updateCoords(tuple.String(), other.Clone(), rtt); err != nil {
 		log.Println("[ERROR]", err)
 	}
 
