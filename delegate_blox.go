@@ -3,15 +3,15 @@ package phi
 import (
 	"log"
 
-	"github.com/hexablock/blox/block"
+	"github.com/hexablock/blox/device"
 	kelips "github.com/hexablock/go-kelips"
 )
 
 // BlockSet is the blox delegate to handle block inserts to the dht
-func (phi *Phi) BlockSet(blk block.Block) {
-
+func (phi *Phi) BlockSet(index device.IndexEntry) {
 	tuple := kelips.TupleHost(phi.local.Address)
-	if err := phi.dht.Insert(blk.ID(), tuple); err != nil {
+
+	if err := phi.dht.Insert(index.ID(), tuple); err != nil {
 		log.Printf("[ERROR] Failed to insert to dht: %s", err)
 	}
 

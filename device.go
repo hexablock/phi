@@ -64,7 +64,7 @@ func (dev *BlockDevice) Hasher() func() hash.Hash {
 
 // BlockExists returns true if the block exists on any one of the assigned nodes
 func (dev *BlockDevice) BlockExists(id []byte) (bool, error) {
-	nodes, err := dev.dht.LookupGroupNodes(id)
+	nodes, err := dev.dht.Lookup(id)
 	if err != nil {
 		return false, err
 	}
