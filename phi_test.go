@@ -66,7 +66,7 @@ func newTestPhi(klpAddr, httpAddr, host string, port int) (*Phi, error) {
 	return Create(conf, fsm)
 }
 
-func Test_Fidias(t *testing.T) {
+func Test_Phi(t *testing.T) {
 	// node 1
 	fid0, err := newTestPhi("127.0.0.1:41000", "127.0.0.1:18080", "127.0.0.1", 44550)
 	if err != nil {
@@ -109,7 +109,8 @@ func Test_Fidias(t *testing.T) {
 	rd, _ := os.Open("./phi.go")
 	defer rd.Close()
 
-	if err = blx.WriteIndex(rd); err != nil {
+	wrIdx, err := blx.WriteIndex(rd, 2)
+	if err != nil {
 		t.Fatal(err)
 	}
 
@@ -122,7 +123,11 @@ func Test_Fidias(t *testing.T) {
 	opt.PeerSet = p
 	opt.WaitApply = true
 	opt.WaitBallot = true
-	if _, _, err := wal.ProposeEntry(entry, opt, 3, 30*time.Millisecond); err != nil {
+	if _, _, err = wal.ProposeEntry(entry, opt, 3, 30*time.Millisecond); err != nil {
+		t.Fatal(err)
+	}
+
+	if err = blx.ReadIndex(wrIdx.ID(), ioutil.Discard, 2); err != nil {
 		t.Fatal(err)
 	}
 

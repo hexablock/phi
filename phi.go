@@ -167,13 +167,20 @@ func (phi *Phi) initBlockDevice() error {
 	dir := filepath.Join(phi.conf.DataDir, "block")
 	os.MkdirAll(dir, 0755)
 	// Local
-	index := device.NewInmemIndex()
-	raw, err := device.NewFileRawDevice(phi.conf.DataDir, phi.conf.HashFunc)
+	//index := device.NewInmemIndex()
+	index := hexaboltdb.NewBlockIndex()
+	if err = index.Open(dir); err != nil {
+		return err
+	}
+	raw, err := device.NewFileRawDevice(dir, phi.conf.HashFunc)
 	if err != nil {
 		return err
 	}
 	dev := device.NewBlockDevice(index, raw)
 	dev.SetDelegate(phi)
+
+	// Sync raw device and index
+	dev.Reindex()
 
 	// Remote
 	opts := blox.DefaultNetClientOptions(phi.conf.HashFunc)
