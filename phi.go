@@ -269,6 +269,12 @@ func (phi *Phi) startGrpc() error {
 	return nil
 }
 
+// LocalNode returns the local node from the dht.  This will be different from
+// the internal local which is cached
+func (phi *Phi) LocalNode() hexatype.Node {
+	return phi.dht.LocalNode()
+}
+
 // DHT returns a distributed hash table interface
 func (phi *Phi) DHT() DHT {
 	return phi.dht
