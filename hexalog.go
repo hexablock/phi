@@ -120,9 +120,10 @@ func (hexlog *Hexalog) ProposeEntry(entry *hexalog.Entry, opts *hexalog.RequestO
 		retryInt = 30 * time.Millisecond
 	}
 
-	log.Printf("[DEBUG] Proposing key=%s participants=%d", entry.Key, len(opts.PeerSet))
+	ps := len(opts.PeerSet)
 
 	for i := 0; i < retries; i++ {
+		log.Printf("[DEBUG] Proposing key=%s participants=%d try=%d/%d", entry.Key, ps, i, retries)
 		// Propose with retries.  Retry only on a ErrPreviousHash error
 		var resp *hexalog.ReqResp
 		if resp, err = hexlog.trans.ProposeEntry(context.Background(), opts.PeerSet[0].Host, entry, opts); err == nil {

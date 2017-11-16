@@ -49,7 +49,7 @@ func (del *delegate) NodeMeta(limit int) []byte {
 
 	b, err := proto.Marshal(&node)
 	if err == nil {
-		log.Printf("[DEBUG] NodeMeta: size=%d/%d", len(b), limit)
+		//log.Printf("[DEBUG] NodeMeta: size=%d/%d", len(b), limit)
 		return b
 	}
 	log.Printf("[ERROR] NodeMeta: %v", err)

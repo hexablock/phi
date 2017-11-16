@@ -301,7 +301,10 @@ func (phi *Phi) Join(existing []string) error {
 	//
 	// }
 
-	_, err := phi.memberlist.Join(existing)
+	n, err := phi.memberlist.Join(existing)
+	if err == nil {
+		log.Println("[INFO] Joined peers:", n)
+	}
 	return err
 }
 
