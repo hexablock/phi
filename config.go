@@ -52,7 +52,7 @@ func (config *Config) SetHashFunc(hf func() hash.Hash) {
 // DefaultConfig returns a minimally required config
 func DefaultConfig() *Config {
 	conf := &Config{
-		Replicas:        2,
+		Replicas:        1,
 		WalSeedBuffSize: 32,
 		WalSeedParallel: 2,
 		Peers:           []string{},

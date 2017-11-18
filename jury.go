@@ -19,7 +19,7 @@ func NewSimpleJury(dht DHT) *SimpleJury {
 // Participants gets the AffinityGroup group for the key and returns the nodes
 // in that group as participants
 func (jury *SimpleJury) Participants(key []byte, min int) ([]*hexalog.Participant, error) {
-	nodes, err := jury.dht.LookupGroupNodes(key)
+	nodes, err := jury.dht.LookupNodes(key, min)
 	if err != nil {
 		return nil, err
 	}

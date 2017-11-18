@@ -78,7 +78,7 @@ func (dev *BlockDevice) BlockExists(id []byte) (bool, error) {
 
 // SetBlock writes the block to the device
 func (dev *BlockDevice) SetBlock(blk block.Block) ([]byte, error) {
-	nodes, err := dev.dht.LookupGroupNodes(blk.ID())
+	nodes, err := dev.dht.LookupNodes(blk.ID(), dev.replicas)
 	if err != nil {
 		return nil, err
 	}

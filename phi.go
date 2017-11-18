@@ -21,6 +21,7 @@ import (
 
 // DHT implements a distributed hash table needed to route keys
 type DHT interface {
+	LookupNodes(key []byte, min int) ([]*hexatype.Node, error)
 	LookupGroupNodes(key []byte) ([]*hexatype.Node, error)
 	Lookup(key []byte) ([]*hexatype.Node, error)
 	Insert(key []byte, tuple kelips.TupleHost) error
@@ -243,13 +244,6 @@ func (phi *Phi) initHexalog(fsm FSM) error {
 	phi.wal = NewHexalog(trans, c.Votes, c.Hasher)
 	phi.wal.RegisterJury(NewSimpleJury(phi.dht))
 
-	// phi.wal = &Hexalog{
-	// 	hashFunc: c.Hasher,
-	// 	minVotes: c.Votes,
-	// 	trans:    trans,
-	// 	jury:     &SimpleJury{dht: phi.dht},
-	// }
-
 	return nil
 }
 
@@ -296,15 +290,11 @@ func (phi *Phi) Join(existing []string) error {
 		return fmt.Errorf("hexalog not initialized")
 	}
 
-	// err:=phi.hexalog.Seed(existing, phi.conf.WalSeedBuffSize, phi.conf.WalSeedParallel)
-	// if err==nil {
-	//
-	// }
-
 	n, err := phi.memberlist.Join(existing)
 	if err == nil {
 		log.Println("[INFO] Joined peers:", n)
 	}
+
 	return err
 }
 
