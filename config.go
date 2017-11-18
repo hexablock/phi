@@ -13,16 +13,16 @@ import (
 
 // Config is the fidias config
 type Config struct {
-	// Default block replicas
+	// Block replicas
 	Replicas int
 
 	// Data directory
 	DataDir string
 
-	// Wal buffer size when seeding data
+	// WAL buffer size when seeding data
 	WalSeedBuffSize int
 
-	// Wal parallel go-routines for seeding
+	// WAL parallel go-routines for seeding
 	WalSeedParallel int
 
 	// Any existing peers. This will automatically cause the node to join the
@@ -60,6 +60,7 @@ func DefaultConfig() *Config {
 		DHT:             kelips.DefaultConfig(""),
 		GRPCServer:      grpc.NewServer(),
 	}
+	conf.DHT.NumGroups = 3
 	conf.Hexalog.Votes = 2
 	conf.SetHashFunc(sha256.New)
 

@@ -153,12 +153,13 @@ func (phi *Phi) initDHT() error {
 
 	remote := kelips.NewUDPTransport(ln)
 	phi.dht = kelips.Create(phi.conf.DHT, remote)
+
 	phi.local = phi.dht.LocalNode()
 
 	return nil
 }
 
-// must be called after dht is init'd
+// must be called after dht is init'd.  It listens on the same port as the dht
 func (phi *Phi) initBlockDevice() error {
 	ln, err := net.Listen("tcp", phi.conf.DHT.AdvertiseHost)
 	if err != nil {
