@@ -243,7 +243,8 @@ func (phi *Phi) initHexalog(fsm FSM) error {
 	}
 
 	phi.wal = NewHexalog(trans, c.Votes, c.Hasher)
-	phi.wal.RegisterJury(NewSimpleJury(phi.dht))
+	phi.conf.Jury.RegisterDHT(phi.dht)
+	phi.wal.RegisterJury(phi.conf.Jury)
 
 	return nil
 }

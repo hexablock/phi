@@ -2,6 +2,7 @@ package phi
 
 import (
 	"crypto/sha256"
+	"encoding/hex"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -56,6 +57,7 @@ func newTestPhi(klpAddr, httpAddr, host string, port int) (*Phi, error) {
 	conf := DefaultConfig()
 	conf.Memberlist = testMemberlistConfig(klpAddr, host, port)
 	conf.DHT = kelips.DefaultConfig(klpAddr)
+	conf.DHT.EnablePropogation = true
 	conf.DHT.Meta["hexalog"] = httpAddr
 	conf.Hexalog = hexalog.DefaultConfig(httpAddr)
 	conf.Hexalog.Votes = 2
@@ -106,7 +108,10 @@ func Test_Phi(t *testing.T) {
 
 	dev := fid1.BlockDevice()
 	blx := blox.NewBlox(dev)
-	rd, _ := os.Open("./phi.go")
+	rd, err := os.Open("./phi.go")
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer rd.Close()
 
 	wrIdx, err := blx.WriteIndex(rd, 2)
@@ -128,7 +133,7 @@ func Test_Phi(t *testing.T) {
 	}
 
 	if err = blx.ReadIndex(wrIdx.ID(), ioutil.Discard, 2); err != nil {
-		t.Fatal(err)
+		t.Fatal(err, hex.EncodeToString(wrIdx.ID()))
 	}
 
 }

@@ -33,6 +33,9 @@ type Config struct {
 	Hexalog    *hexalog.Config
 	DHT        *kelips.Config
 
+	// Hexalog jury selector
+	Jury Jury
+
 	// Grpc server to allow user services to be registered
 	GRPCServer *grpc.Server
 }
@@ -59,6 +62,7 @@ func DefaultConfig() *Config {
 		Hexalog:         hexalog.DefaultConfig(""),
 		DHT:             kelips.DefaultConfig(""),
 		GRPCServer:      grpc.NewServer(),
+		Jury:            &SimpleJury{},
 	}
 	conf.DHT.NumGroups = 3
 	conf.Hexalog.Votes = 2

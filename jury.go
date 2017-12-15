@@ -11,9 +11,8 @@ type SimpleJury struct {
 	dht DHT
 }
 
-// NewSimpleJury inits a new Kelips DHT backed jury
-func NewSimpleJury(dht DHT) *SimpleJury {
-	return &SimpleJury{dht: dht}
+func (jury *SimpleJury) RegisterDHT(dht DHT) {
+	jury.dht = dht
 }
 
 // Participants gets the AffinityGroup group for the key and returns the nodes

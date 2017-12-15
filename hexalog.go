@@ -21,6 +21,7 @@ type WriteStats struct {
 // are the peers participating in the voting process
 type Jury interface {
 	Participants(key []byte, min int) ([]*hexalog.Participant, error)
+	RegisterDHT(dht DHT)
 }
 
 // Hexalog is a network aware Hexalog.  It implements selecting the
