@@ -96,9 +96,9 @@ func Create(conf *Config, fsm FSM) (*Phi, error) {
 		ltime: &hexatype.LamportClock{},
 		coord: coord,
 	}
-
+	//
 	// The order of initialization is important
-
+	//
 	if err = fid.initDHT(); err != nil {
 		return nil, err
 	}

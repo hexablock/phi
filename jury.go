@@ -5,12 +5,13 @@ import (
 	"github.com/hexablock/hexatype"
 )
 
-// SimpleJury implements a Jury interface using kelips dht as the backend.  It
-// returns the first n nodes available in a group
+// SimpleJury implements a Jury interface.  It returns the first n nodes
+// available for a given key.
 type SimpleJury struct {
 	dht DHT
 }
 
+// RegisterDHT registers a dht interface required to get participants
 func (jury *SimpleJury) RegisterDHT(dht DHT) {
 	jury.dht = dht
 }
