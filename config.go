@@ -19,7 +19,7 @@ type Config struct {
 	// Data directory
 	DataDir string
 
-	// WAL buffer size when seeding data
+	// WAL buffer size when seeding data on bootstrap
 	WalSeedBuffSize int
 
 	// WAL parallel go-routines for seeding
@@ -33,7 +33,7 @@ type Config struct {
 	Hexalog    *hexalog.Config
 	DHT        *kelips.Config
 
-	// Hexalog jury selector
+	// Hexalog jury selection algorithm to use
 	Jury Jury
 
 	// Grpc server to allow user services to be registered

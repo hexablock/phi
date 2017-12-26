@@ -40,8 +40,9 @@ func NewBlockDevice(replicas int, hashFunc func() hash.Hash, trans blox.Transpor
 	}
 }
 
-// Register registers the block device to the transport.  This is used in the
-// case where the node is a member of the cluster rather than just a client
+// Register registers the actual block device to the transport.  This is used
+// in the case where the node is a member of the cluster rather than just a
+// client
 func (dev *BlockDevice) Register(blkDev *device.BlockDevice) {
 	dev.trans.Register(blkDev)
 }

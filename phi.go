@@ -28,13 +28,6 @@ type DHT interface {
 	Delete(key []byte, tuple kelips.TupleHost) error
 }
 
-// WALTransport implements an interface for network log operations
-type WALTransport interface {
-	NewEntry(host string, key []byte, opts *hexalog.RequestOptions) (*hexalog.Entry, error)
-	ProposeEntry(ctx context.Context, host string, entry *hexalog.Entry, opts *hexalog.RequestOptions) (*hexalog.ReqResp, error)
-	GetEntry(host string, key []byte, id []byte, opts *hexalog.RequestOptions) (*hexalog.Entry, error)
-}
-
 // WAL implements an interface to provide p2p distributed consensus
 type WAL interface {
 	NewEntry(key []byte) (*hexalog.Entry, []*hexalog.Participant, error)
@@ -42,6 +35,13 @@ type WAL interface {
 	ProposeEntry(entry *hexalog.Entry, opts *hexalog.RequestOptions, retries int, retryInt time.Duration) ([]byte, *WriteStats, error)
 	GetEntry(key []byte, id []byte) (*hexalog.Entry, error)
 	RegisterJury(jury Jury)
+}
+
+// WALTransport implements an interface for network log operations
+type WALTransport interface {
+	NewEntry(host string, key []byte, opts *hexalog.RequestOptions) (*hexalog.Entry, error)
+	ProposeEntry(ctx context.Context, host string, entry *hexalog.Entry, opts *hexalog.RequestOptions) (*hexalog.ReqResp, error)
+	GetEntry(host string, key []byte, id []byte, opts *hexalog.RequestOptions) (*hexalog.Entry, error)
 }
 
 // FSM implements a phi fsm using a dht
@@ -127,14 +127,15 @@ func (phi *Phi) init() {
 	phi.dlg = &delegate{
 		local:      phi.local,
 		coord:      phi.coord,
+		ltime:      phi.ltime,
 		dht:        phi.dht,
 		broadcasts: make([][]byte, 0),
 	}
 
-	//
+	// Set all delegates
 	c := phi.conf.Memberlist
 	c.Delegate = phi.dlg
-	c.Ping = phi
+	c.Ping = phi.dlg
 	c.Events = phi.dlg
 	c.Alive = phi.dlg
 	c.Conflict = phi.dlg
@@ -178,6 +179,7 @@ func (phi *Phi) initBlockDevice() error {
 	if err != nil {
 		return err
 	}
+	// Set block device delegate
 	dev := device.NewBlockDevice(index, raw)
 	dev.SetDelegate(phi)
 

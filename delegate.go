@@ -21,6 +21,9 @@ type delegate struct {
 	// Local node
 	local hexatype.Node
 
+	// lamport clock
+	ltime *hexatype.LamportClock
+
 	// Coordinate for virtual positioning
 	coord *vivaldi.Client
 
