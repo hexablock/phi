@@ -32,7 +32,14 @@ and decentralized systems.  Some of the design patterns used are:
 
 ### Development
 
-- When using debug mode a significant performance degrade may be seen.
+#### Ports
+The following ports are used depending on the port configuration:
+
+- Membership changes and fault-tolerance
+- Lookups and Data access
+- Write Ahead Log
+
+**Note**: When using debug mode a significant performance degrade may be seen.
 
 ### Known Issues
 
