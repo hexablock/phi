@@ -169,32 +169,35 @@ func (phi *Phi) initBlockDevice() error {
 
 	dir := filepath.Join(phi.conf.DataDir, "block")
 	os.MkdirAll(dir, 0755)
-	// Local
+
+	// Local block index
 	//index := device.NewInmemIndex()
 	index := hexaboltdb.NewBlockIndex()
 	if err = index.Open(dir); err != nil {
 		return err
 	}
+	// Local block device
 	raw, err := device.NewFileRawDevice(dir, phi.conf.HashFunc)
 	if err != nil {
 		return err
 	}
-	// Set block device delegate
-	dev := device.NewBlockDevice(index, raw)
-	dev.SetDelegate(phi)
 
+	// Setup block device
+	dev := device.NewBlockDevice(index, raw)
+	// Assign delegate to block device
+	dev.SetDelegate(phi)
 	// Sync raw device and index
 	dev.Reindex()
 
-	// Remote
+	// Remote block transport
 	opts := blox.DefaultNetClientOptions(phi.conf.HashFunc)
 	remote := blox.NewNetTransport(opts)
 
-	// Local and remote
+	// Local and remote block transport
 	trans := blox.NewLocalNetTranport(phi.conf.DHT.AdvertiseHost, remote)
 
 	// DHT block device
-	phi.dev = NewBlockDevice(phi.conf.Replicas, phi.conf.HashFunc, trans)
+	phi.dev = NewBlockDevice(phi.conf.Replicas, phi.conf.HashFunc, phi.local, index, trans)
 	phi.dev.Register(dev)
 	phi.dev.RegisterDHT(phi.dht)
 

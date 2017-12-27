@@ -4,19 +4,25 @@ import (
 	"errors"
 	"fmt"
 	"hash"
+	"log"
 
 	"github.com/hexablock/blox"
 	"github.com/hexablock/blox/block"
 	"github.com/hexablock/blox/device"
+	kelips "github.com/hexablock/go-kelips"
+	"github.com/hexablock/hexatype"
 )
 
 var errBloxAddrMissing = errors.New("blox address missing")
 
 // BlockDevice implements the blox.BlockDevice interface backed by a dht to
-// distribute blocks into the cluster.  The filesystem uses this as its
-// underlying device.
+// distribute blocks into the cluster.  It serves as a Participant as well as a
+// client
 type BlockDevice struct {
 	dht DHT
+
+	// Node address to use when advertising local blocks
+	local hexatype.Node
 
 	// Min number of block replicas
 	replicas int
@@ -24,7 +30,12 @@ type BlockDevice struct {
 	// hash function to use
 	hashFunc func() hash.Hash
 
-	// Blox transport.  This can be either LocalNetTransport for cluster members
+	// Index used to advertise to dht. Only valid for Participant nodes
+	idx device.BlockIndex
+	// Underlying block device. Only valide for Participant nodes
+	dev *device.BlockDevice
+
+	// Blox transport. This can be either LocalNetTransport for cluster members
 	// or a blox.NetClient one for clients
 	trans blox.Transport
 }
@@ -32,9 +43,11 @@ type BlockDevice struct {
 // NewBlockDevice inits a new Device that implements a BlockDevice that is
 // leverages the dht with the given replica count, hash function and blox
 // transport.
-func NewBlockDevice(replicas int, hashFunc func() hash.Hash, trans blox.Transport) *BlockDevice {
+func NewBlockDevice(replicas int, hashFunc func() hash.Hash, local hexatype.Node, idx device.BlockIndex, trans blox.Transport) *BlockDevice {
 	return &BlockDevice{
+		local:    local,
 		replicas: replicas,
+		idx:      idx,
 		hashFunc: hashFunc,
 		trans:    trans,
 	}
@@ -44,13 +57,29 @@ func NewBlockDevice(replicas int, hashFunc func() hash.Hash, trans blox.Transpor
 // in the case where the node is a member of the cluster rather than just a
 // client
 func (dev *BlockDevice) Register(blkDev *device.BlockDevice) {
-	dev.trans.Register(blkDev)
+	dev.dev = blkDev
+	dev.trans.Register(dev.dev)
 }
 
 // RegisterDHT registers the DHT to the device.  This device is only usable once
 // a call to register has been made.
 func (dev *BlockDevice) RegisterDHT(dht DHT) {
 	dev.dht = dht
+	go dev.advertiseBlocks()
+}
+
+// read block ids and publish to dht.  This is used during initialization
+func (dev *BlockDevice) advertiseBlocks() {
+	if dev.idx == nil {
+		return
+	}
+	dev.idx.Iter(func(index *device.IndexEntry) error {
+		tuple := kelips.TupleHost(dev.local.Address)
+		if err := dev.dht.Insert(index.ID(), tuple); err != nil {
+			log.Printf("[ERROR] Failed to insert to dht: %s", err)
+		}
+		return nil
+	})
 }
 
 // Stats is to satisfy the interface
