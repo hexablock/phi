@@ -4,13 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"hash"
-	"log"
 
 	"github.com/hexablock/blox"
 	"github.com/hexablock/blox/block"
 	"github.com/hexablock/blox/device"
 	kelips "github.com/hexablock/go-kelips"
 	"github.com/hexablock/hexatype"
+	"github.com/hexablock/log"
 )
 
 var errBloxAddrMissing = errors.New("blox address missing")

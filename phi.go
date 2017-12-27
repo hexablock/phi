@@ -3,19 +3,20 @@ package phi
 import (
 	"context"
 	"fmt"
-	"log"
 	"net"
 	"os"
 	"path/filepath"
 	"time"
 
 	"github.com/hashicorp/memberlist"
+
 	"github.com/hexablock/blox"
 	"github.com/hexablock/blox/device"
 	"github.com/hexablock/go-kelips"
 	hexaboltdb "github.com/hexablock/hexa-boltdb"
 	"github.com/hexablock/hexalog"
 	"github.com/hexablock/hexatype"
+	"github.com/hexablock/log"
 	"github.com/hexablock/vivaldi"
 )
 

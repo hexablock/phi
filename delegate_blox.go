@@ -1,10 +1,9 @@
 package phi
 
 import (
-	"log"
-
 	"github.com/hexablock/blox/device"
 	kelips "github.com/hexablock/go-kelips"
+	"github.com/hexablock/log"
 )
 
 // BlockSet is the blox delegate called when new blocks are set.  It  handles
