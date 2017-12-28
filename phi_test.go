@@ -128,7 +128,7 @@ func Test_Phi(t *testing.T) {
 	opt.PeerSet = p
 	opt.WaitApply = true
 	opt.WaitBallot = true
-	if _, _, err = wal.ProposeEntry(entry, opt, 3, 30*time.Millisecond); err != nil {
+	if _, _, err = wal.ProposeEntry(entry, opt, DefaultRetryOptions()); err != nil {
 		t.Fatal(err)
 	}
 

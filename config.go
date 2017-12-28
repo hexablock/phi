@@ -29,9 +29,13 @@ type Config struct {
 	// cluster
 	Peers []string
 
+	// Membership and fault-tolerance
 	Memberlist *memberlist.Config
-	Hexalog    *hexalog.Config
-	DHT        *kelips.Config
+
+	// WAL
+	Hexalog *hexalog.Config
+
+	DHT *kelips.Config
 
 	// Hexalog jury selection algorithm to use
 	Jury Jury

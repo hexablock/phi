@@ -17,6 +17,12 @@ type WriteStats struct {
 	Participants []*hexalog.Participant
 }
 
+// RetryOptions for WAL proposals
+type RetryOptions struct {
+	Retries       int
+	RetryInterval time.Duration
+}
+
 // Jury implements an interface to get participants for an entry proposal. These
 // are the peers participating in the voting process
 type Jury interface {
@@ -38,6 +44,14 @@ type Hexalog struct {
 
 	// Jury selector for voting rounds
 	jury Jury
+}
+
+// DefaultRetryOptions returns a default set of RetryOptions
+func DefaultRetryOptions() *RetryOptions {
+	return &RetryOptions{
+		Retries:       1,
+		RetryInterval: 30 * time.Millisecond,
+	}
 }
 
 // NewHexalog inita a new DHT aware WAL
@@ -112,19 +126,23 @@ func (hexlog *Hexalog) GetEntry(key, id []byte) (*hexalog.Entry, error) {
 // ProposeEntry finds locations for the entry and proposes it to those locations
 // It retries the specified number of times before returning.  It returns a an
 // entry id on success and error otherwise
-func (hexlog *Hexalog) ProposeEntry(entry *hexalog.Entry, opts *hexalog.RequestOptions, retries int, retryInt time.Duration) (eid []byte, stats *WriteStats, err error) {
-	if retries < 1 {
-		retries = 1
-	}
+func (hexlog *Hexalog) ProposeEntry(entry *hexalog.Entry, opts *hexalog.RequestOptions, retry *RetryOptions) (eid []byte, stats *WriteStats, err error) {
+	if retry == nil {
+		retry = DefaultRetryOptions()
+	} else {
+		if retry.Retries < 1 {
+			retry.Retries = 1
+		}
 
-	if retryInt == 0 {
-		retryInt = 30 * time.Millisecond
+		if retry.RetryInterval == 0 {
+			retry.RetryInterval = 30 * time.Millisecond
+		}
 	}
 
 	ps := len(opts.PeerSet)
 
-	for i := 0; i < retries; i++ {
-		log.Printf("[DEBUG] Proposing key=%s participants=%d try=%d/%d", entry.Key, ps, i, retries)
+	for i := 0; i < retry.Retries; i++ {
+		log.Printf("[DEBUG] Proposing key=%s participants=%d try=%d/%d", entry.Key, ps, i, retry.Retries)
 		// Propose with retries.  Retry only on a ErrPreviousHash error
 		var resp *hexalog.ReqResp
 		if resp, err = hexlog.trans.ProposeEntry(context.Background(), opts.PeerSet[0].Host, entry, opts); err == nil {
@@ -138,7 +156,7 @@ func (hexlog *Hexalog) ProposeEntry(entry *hexalog.Entry, opts *hexalog.RequestO
 			return
 
 		} else if err == hexatype.ErrPreviousHash {
-			time.Sleep(retryInt)
+			time.Sleep(retry.RetryInterval)
 		} else {
 			return
 		}

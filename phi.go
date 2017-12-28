@@ -33,7 +33,7 @@ type DHT interface {
 type WAL interface {
 	NewEntry(key []byte) (*hexalog.Entry, []*hexalog.Participant, error)
 	NewEntryFrom(entry *hexalog.Entry) (*hexalog.Entry, []*hexalog.Participant, error)
-	ProposeEntry(entry *hexalog.Entry, opts *hexalog.RequestOptions, retries int, retryInt time.Duration) ([]byte, *WriteStats, error)
+	ProposeEntry(entry *hexalog.Entry, opts *hexalog.RequestOptions, retry *RetryOptions) ([]byte, *WriteStats, error)
 	GetEntry(key []byte, id []byte) (*hexalog.Entry, error)
 	RegisterJury(jury Jury)
 }
