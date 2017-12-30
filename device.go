@@ -125,6 +125,7 @@ func (dev *BlockDevice) SetBlock(blk block.Block) ([]byte, error) {
 		} else {
 			// Latest set block id
 			id = bid
+			log.Printf("[INFO] Block set id=%x host=%s", id, loc.Host())
 		}
 
 	}

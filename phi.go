@@ -123,6 +123,7 @@ func Create(conf *Config, fsm FSM) (*Phi, error) {
 	return fid, err
 }
 
+// init is called after all other components are initialized
 func (phi *Phi) init() {
 
 	phi.dlg = &delegate{
